@@ -236,6 +236,8 @@ function handleNewTurn(data) {
  */
 function handleEndOfTurn(data) {
 
+    console.log(data);
+
     // Reset zoom to default
     map.setZoom(2);
 
@@ -256,6 +258,16 @@ function handleEndOfTurn(data) {
 
     }
 
+    if (data.other_answers) {
+
+        data.other_answers.forEach(function(otherAnswer) {
+            console.log(otherAnswer);
+            var otherMarker = createMarker(otherAnswer.lat, otherAnswer.lng, 'yellow');
+            otherMarker.bindPopup('Rank ' + otherAnswer.rank + '(<b>' + round(otherAnswer.distance) + ' km</b> away)');
+        })
+
+    }
+
     // Show correct answer
     var correctMarker = createMarker(data.correct_answer.lat, data.correct_answer.lng, 'red');
     correctMarker.bindPopup(data.correct_answer.name);
@@ -270,6 +282,7 @@ function handleEndOfTurn(data) {
  * @param data
  */
 function showPlayerResults(data) {
+    console.log(data);
 
     // Place a marker to identify user answer
     var userMarker = createMarker(data.lat, data.lng, 'blue');

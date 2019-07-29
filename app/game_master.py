@@ -94,6 +94,16 @@ class GameMaster:
                 'lng': best_answer.longitude
             }
 
+            turn_results['other_answers'] = []
+            for rank, player in enumerate(ranked_players[1:]):
+                result = player.get_result(self.game.turn_number)
+                answer = player.get_answer(self.game.turn_number)
+                turn_results['other_answers'].append({
+                    'rank': rank + 1,
+                    'distance': result.distance,
+                    'lat': answer.latitude,
+                    'lng': answer.longitude
+                })
         socketio.emit('end_of_turn', turn_results)
 
         # Then send individual player results
