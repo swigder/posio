@@ -116,7 +116,7 @@ class Game:
         # Select every cities in random order
         c = conn.cursor()
 
-        c.execute('SELECT name, country, latitude, longitude FROM cities ORDER BY RANDOM()')  # noqa
+        c.execute('SELECT name, country, latitude, longitude FROM original_cities ORDER BY RANDOM()')  # noqa
 
         cities = []
         for name, country, latitude, longitude in c.fetchall():
