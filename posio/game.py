@@ -116,7 +116,22 @@ class Game:
         # Select every cities in random order
         c = conn.cursor()
 
-        c.execute('SELECT name, country, latitude, longitude FROM original_cities ORDER BY RANDOM()')  # noqa
+        largest_population_and_capitals_for_each_country_query = '''
+                SELECT city, country, lat as latitude, lng as longitude
+                    FROM
+                    (
+                        SELECT city, country, lat, lng, capital, admin_name, MAX(population) as population
+                            FROM cities
+                            GROUP BY country
+                        UNION
+                        SELECT city, country, lat, lng, capital, admin_name, population
+                            FROM cities
+                            WHERE capital='primary'
+                            GROUP BY country
+                    )
+                    ORDER BY RANDOM()
+                '''
+        c.execute(largest_population_and_capitals_for_each_country_query)  # noqa
 
         cities = []
         for name, country, latitude, longitude in c.fetchall():
