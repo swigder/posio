@@ -139,7 +139,7 @@ class Game:
         Generates the SQL city query.
 
         :param region: The region (continent) to restrict the game to.
-        :return The SQL query string.
+        :return: The SQL query string.
         """
         largest_population_for_each_country_query = '''
                 SELECT city, country, lat, lng, capital, admin_name, MAX(population) as population, iso3
