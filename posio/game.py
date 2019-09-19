@@ -116,22 +116,8 @@ class Game:
         # Select every cities in random order
         c = conn.cursor()
 
-        largest_population_and_capitals_for_each_country_query = '''
-                SELECT city, country, lat as latitude, lng as longitude
-                    FROM
-                    (
-                        SELECT city, country, lat, lng, capital, admin_name, MAX(population) as population
-                            FROM cities
-                            GROUP BY country
-                        UNION
-                        SELECT city, country, lat, lng, capital, admin_name, population
-                            FROM cities
-                            WHERE capital='primary'
-                            GROUP BY country
-                    )
-                    ORDER BY RANDOM()
-                '''
-        c.execute(largest_population_and_capitals_for_each_country_query)  # noqa
+        renaming_and_randomizing_query = Game.generate_city_query()
+        c.execute(renaming_and_randomizing_query)  # noqa
 
         cities = []
         for name, country, latitude, longitude in c.fetchall():
@@ -146,6 +132,51 @@ class Game:
         conn.close()
 
         return cities
+
+    @staticmethod
+    def generate_city_query(region: str = None) -> str:
+        """
+        Generates the SQL city query.
+
+        :param region: The region (continent) to restrict the game to.
+        :return The SQL query string.
+        """
+        largest_population_for_each_country_query = '''
+                SELECT city, country, lat, lng, capital, admin_name, MAX(population) as population, iso3
+                    FROM cities
+                    GROUP BY country
+        '''
+        captial_for_each_country_query = '''
+                SELECT city, country, lat, lng, capital, admin_name, population, iso3
+                    FROM cities
+                    WHERE capital='primary'
+                    GROUP BY country
+        '''
+        # Get the largest and capital cities for each country.
+        city_query = f'''
+                SELECT city, country, lat, lng, capital, admin_name, population, iso3
+                    FROM
+                    (
+                        {largest_population_for_each_country_query}
+                        UNION
+                        {captial_for_each_country_query}
+                    )
+                '''
+        if region is not None:  # Restrict the game to the specified region.
+            city_query = f'''
+                    SELECT city, country, lat, lng, capital, admin_name, population, iso3
+                        FROM ({city_query}) as important_cities
+                        LEFT JOIN country_code_to_continent
+                            ON country_code_to_continent."alpha-3" = important_cities.iso3
+                        WHERE region = '{region}'
+            '''
+        # Randomize the cities and use the column names the game expects.
+        city_query = f'''
+                SELECT city, country, lat as latitude, lng as longitude
+                    FROM ({city_query})
+                    ORDER BY RANDOM()
+        '''
+        return city_query
 
     @staticmethod
     def plane_distance(latitude1, longitude1, latitude2, longitude2):
