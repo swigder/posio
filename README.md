@@ -24,3 +24,7 @@ To run the application :
     python run.py
 
 Open the following URL in your browser: [http://localhost:5000](http://localhost:5000)
+
+## Database
+
+Database provided by Simplemaps.com (Pareto Software, LLC), licensed under the Creative Commons Attribution 4.0 license as described at: https://creativecommons.org/licenses/by/4.0/. 
