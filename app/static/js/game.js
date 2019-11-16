@@ -238,8 +238,8 @@ function handleEndOfTurn(data) {
 
     console.log(data);
 
-    // Reset zoom to default
-    map.setZoom(2);
+    // // Reset zoom to default
+    // map.setZoom(2);
 
     // Disable answers listener
     map.off('click', answer);
